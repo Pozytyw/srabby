@@ -1,12 +1,16 @@
 package Executors;
 
+import com.srabby.application.ConsoleRequestEventListener;
+import com.srabby.http.common.RequestEventListener;
 import com.srabby.http.common.requests.Request;
 import com.srabby.http.common.RequestBuilder;
+import com.srabby.http.errors.ScrapeErrors;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ExecutorsTest {
     private final String url= "https://en.wikipedia.org/wiki/Special:Random";
+    private final String badUrl= "";
     private final String cssSelector= "#firstHeading";
 
     @Test
@@ -19,7 +23,11 @@ public class ExecutorsTest {
                     .build();
 
             //execute request
-            request.execute(requestExecutor);
+            try {
+                request.execute(requestExecutor);
+            }catch (ScrapeErrors er){
+                er.printStackTrace();
+            }
 
             Assert.assertNotNull(request.getResponse());
         });
@@ -27,25 +35,44 @@ public class ExecutorsTest {
 
     @Test
     public void multiThreadingTest(){
+        //create console request observer
+        RequestEventListener requestEventListener = new ConsoleRequestEventListener();
+
         ConcreteExecutorsList.getList().forEach(requestExecutor -> {
             //add 10 request to requestExecutor
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 5; i++) {
                 //create Request
+                //add correct request
                 requestExecutor.addRequest(
                         new RequestBuilder()
+                                .setEventListener(requestEventListener)
                                 .setUrl(url)
                                 .cssRequest(cssSelector)
                                 .build());
+
+                //add request with bad url
+                //without console event listener
+                requestExecutor.addRequest(
+                        new RequestBuilder()
+                        .setUrl(badUrl)
+                        .cssRequest(cssSelector)
+                        .build());
+
             }
-
-
             requestExecutor.executeRequestsSimultaneously();
-            int i = 0;
-            while (!requestExecutor.executionComplete()){
-                i += 1;
-                i -= 1;
+
+            //wait for finish all requests
+            while (true){
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+
+                if(!requestExecutor.isRunning())
+                    break;
             }
         });
-
     }
 }

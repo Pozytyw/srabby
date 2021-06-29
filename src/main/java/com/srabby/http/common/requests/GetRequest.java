@@ -16,6 +16,12 @@ public class GetRequest extends Request{
 
     @Override
     public void execute(RequestExecutor requestExecutor) throws ScrapeErrors {
+        //dispatch start event
+        getEventListeners().forEach(eventListener -> eventListener.onStart(this));
+
         requestExecutor.executeGetRequest(this);
+
+        //dispatch finish event
+        getEventListeners().forEach(eventListener -> eventListener.onFinish(this));
     }
 }

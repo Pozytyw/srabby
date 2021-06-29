@@ -17,6 +17,12 @@ public class CSSRequest extends Request{
     @Override
     //Select nodes, which match to selector
     public void execute(RequestExecutor requestExecutor) throws ScrapeErrors{
+        //dispatch start event
+        getEventListeners().forEach(eventListener -> eventListener.onStart(this));
+
         requestExecutor.executeCSSRequest(this);
+
+        //dispatch finish event
+        getEventListeners().forEach(eventListener -> eventListener.onFinish(this));
     }
 }

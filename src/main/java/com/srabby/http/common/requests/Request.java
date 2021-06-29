@@ -1,22 +1,26 @@
 package com.srabby.http.common.requests;
 
 import com.srabby.http.common.HttpMethod;
+import com.srabby.http.common.RequestEventListener;
 import com.srabby.http.common.RequestExecutor;
 import com.srabby.http.errors.ScrapeErrors;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Request {
     protected String url;
     protected HttpMethod httpMethod;
-    protected Set<String> response;
     protected Map<String, String> httpHeaders;
+
+    protected Set<String> response;
+    //listeners
+    private List<RequestEventListener> eventListeners;
+
+    //error fields
     protected boolean error = false;
     protected String errorMessage;
 
-    public abstract void execute(RequestExecutor requestExecutor) throws ScrapeErrors;;
+    public abstract void execute(RequestExecutor requestExecutor) throws ScrapeErrors;
 
     public void setUrl(String url) {
         this.url = url;
@@ -30,16 +34,15 @@ public abstract class Request {
         return error;
     }
 
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
     public String getErrorMessage() {
         return errorMessage;
     }
 
     public void setErrorMessage(String errorMessage) {
+        error = true;
         this.errorMessage = errorMessage;
+        //dispatch error event
+        eventListeners.forEach(eventListener -> eventListener.onError(this));
     }
 
     public String getUrl() {
@@ -67,5 +70,27 @@ public abstract class Request {
 
     public Map<String, String> getHttpHeaders() {
         return httpHeaders;
+    }
+
+    public void addEventListener(RequestEventListener eventListener){
+        if(eventListeners == null)
+            eventListeners = new LinkedList<>();
+
+        eventListeners.add(eventListener);
+    }
+
+    public void removeEventListener(RequestEventListener eventListener){
+        if(eventListeners == null)
+            eventListeners = new LinkedList<>();
+
+        if(eventListeners.contains(eventListener))
+            eventListeners.remove(eventListener);
+    }
+
+    protected List<RequestEventListener> getEventListeners() {
+        if(eventListeners == null)
+            eventListeners = new LinkedList<>();
+
+        return eventListeners;
     }
 }

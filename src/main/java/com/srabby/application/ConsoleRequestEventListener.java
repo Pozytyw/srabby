@@ -1,11 +1,11 @@
 package com.srabby.application;
 
-import com.srabby.http.common.RequestObserver;
+import com.srabby.http.common.RequestEventListener;
 import com.srabby.http.common.requests.Request;
 
-public class ConsoleRequestObserver implements RequestObserver {
+public class ConsoleRequestEventListener implements RequestEventListener {
     @Override
-    public void onComplete(Request request) {
+    public void onFinish(Request request) {
         System.out.println(request.getResponse());
     }
 

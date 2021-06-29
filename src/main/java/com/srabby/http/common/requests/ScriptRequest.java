@@ -15,6 +15,12 @@ public class ScriptRequest extends Request{
 
     @Override
     public void execute(RequestExecutor requestExecutor) {
+        //dispatch start event
+        getEventListeners().forEach(eventListener -> eventListener.onStart(this));
+
         requestExecutor.executeScriptRequest(this);
+
+        //dispatch finish event
+        getEventListeners().forEach(eventListener -> eventListener.onFinish(this));
     }
 }

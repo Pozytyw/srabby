@@ -6,22 +6,22 @@ import com.srabby.http.errors.ScrapeErrors;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class RequestExecutor {
+public abstract class RequestExecutor implements RequestEventListener{
     private List<RequestThread> requestThreads;
-    private RequestObserver requestObserver;
 
     //amount of concurrently threads
     protected int concurrentlyAmount = 3;
     private int threadIndex = 0;
-    private boolean executionStarted = false;
+    private int started = 0;
+    private int finished = 0;
+    private Boolean running = false;
 
-    public RequestExecutor(RequestObserver requestObserver) {
-        this.requestObserver = requestObserver;
+    public RequestExecutor() {
         this.requestThreads = new LinkedList<>();
     }
 
-    public RequestExecutor(int concurrentlyAmount, RequestObserver requestObserver) {
-        this(requestObserver);
+    public RequestExecutor(int concurrentlyAmount) {
+        this();
         this.concurrentlyAmount = concurrentlyAmount;
     }
 
@@ -30,33 +30,20 @@ public abstract class RequestExecutor {
 
     //multithreading execution
     public void executeRequestsSimultaneously() {
-        executionStarted = true;
-        int n = requestThreads.size();
+        //restart counters
+        started = 0;
+        finished = 0;
 
+        //run
+        running = true;
+
+        //start requestThreads as much as concurrentlyAmount
+        int n = requestThreads.size();
         while (threadIndex < n && threadIndex < concurrentlyAmount){
             requestThreads.get(threadIndex).start();
             threadIndex += 1;
         }
     }
-
-    //request's thread call this method on end of job
-    public void requestThreadComplete(RequestThread requestThread){
-        if(threadIndex < requestThreads.size()) {
-            requestThreads.get(threadIndex).start();
-            threadIndex += 1;
-        }
-    }
-
-    //run to check if execution is complete
-    public boolean executionComplete(){
-        if(requestThreads.stream().filter(requestThread -> requestThread.isComplete()).count() < requestThreads.size())
-            return false;
-
-        //on execution complete
-        executionStarted = false;
-        return true;
-    }
-
 
     //execute methods for all type of requests
     public abstract void executeScriptRequest(ScriptRequest request) throws ScrapeErrors;
@@ -65,17 +52,41 @@ public abstract class RequestExecutor {
     public abstract void executeGetRequest(GetRequest request) throws ScrapeErrors;
 
     public void addRequest(Request request){
-        if(!executionStarted)
-            this.requestThreads.add(new RequestThread(this, request));
+        request.addEventListener(this);
+        this.requestThreads.add(new RequestThread(this, request));
+    }
+
+    @Override
+    public void onFinish(Request request) {
+        if(threadIndex < requestThreads.size()) {
+            requestThreads.get(threadIndex).start();
+            threadIndex += 1;
+        }
+        finished += 1;
+        if(started == finished) {
+            running = false;
+        }
+    }
+
+    @Override
+    public void onError(Request request) {
+        started -= 1;
+        if(started == finished) {
+            running = false;
+        }
+    }
+
+    @Override
+    public void onStart(Request request) {
+        started += 1;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     //get responses from requests
     public List<Request> getRequests() {
         return requestThreads.parallelStream().map(requestThread -> requestThread.getRequest()).collect(Collectors.toList());
-    }
-
-    //getters and setters
-    public RequestObserver getRequestObserver() {
-        return requestObserver;
     }
 }

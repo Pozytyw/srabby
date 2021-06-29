@@ -9,6 +9,7 @@ public final class RequestBuilder {
     private Request request;
     private String url;
     private HttpMethod httpMethod;
+    private RequestEventListener requestEventListener;
     private Map<String, String> httpHeaders;
 
     public RequestBuilder() {
@@ -50,15 +51,18 @@ public final class RequestBuilder {
         return this;
     }
 
-    public Request build(){
-        //complete request must have url
-        if(url.isEmpty())
-            return null;
+    public RequestBuilder setEventListener(RequestEventListener requestEventListener){
+        this.requestEventListener = requestEventListener;
+        return this;
+    }
 
+    public Request build(){
         //set all fields
         request.setUrl(url);
         request.setHttpMethod(httpMethod);
         request.setHttpHeaders(httpHeaders);
+        if(requestEventListener != null)
+            request.addEventListener(requestEventListener);
 
         return request;
     }
