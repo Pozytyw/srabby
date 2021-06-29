@@ -1,5 +1,7 @@
 package com.srabby.http.jsoup;
 
+import com.srabby.http.common.RequestExecutor;
+import com.srabby.http.common.RequestObserver;
 import com.srabby.http.common.requests.*;
 import com.srabby.http.errors.ConnectionException;
 import com.srabby.http.errors.ScrapeErrors;
@@ -9,7 +11,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 public class JsoupExecutor extends RequestExecutor {
+
     private Document document;
+
+    public JsoupExecutor(RequestObserver requestObserver) {
+        super(requestObserver);
+    }
+
+    public JsoupExecutor(int concurrentlyAmount, RequestObserver requestObserver) {
+        super(concurrentlyAmount, requestObserver);
+    }
 
     private Document connect(String url) throws ConnectionException {
         try {

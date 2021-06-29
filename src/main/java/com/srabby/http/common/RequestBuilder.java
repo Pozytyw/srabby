@@ -1,4 +1,6 @@
-package com.srabby.http.common.requests;
+package com.srabby.http.common;
+
+import com.srabby.http.common.requests.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +42,6 @@ public final class RequestBuilder {
     //setters
     public RequestBuilder setUrl(String url) {
         this.url = url;
-        return this;
-    }
-
-    public RequestBuilder setHttpMethod(HttpMethod httpMethod) {
-        this.httpMethod = httpMethod;
         return this;
     }
 

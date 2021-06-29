@@ -1,5 +1,9 @@
 package com.srabby.http.common.requests;
 
+import com.srabby.http.common.HttpMethod;
+import com.srabby.http.common.RequestExecutor;
+import com.srabby.http.errors.ScrapeErrors;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -9,17 +13,13 @@ public abstract class Request {
     protected HttpMethod httpMethod;
     protected Set<String> response;
     protected Map<String, String> httpHeaders;
-    protected boolean error;
+    protected boolean error = false;
     protected String errorMessage;
 
-    public abstract void execute(RequestExecutor requestExecutor);
+    public abstract void execute(RequestExecutor requestExecutor) throws ScrapeErrors;;
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public void setHttpMethod(HttpMethod httpMethod) {
-        this.httpMethod = httpMethod;
     }
 
     public void setHttpHeaders(Map<String, String> httpHeaders) {
@@ -44,6 +44,10 @@ public abstract class Request {
 
     public String getUrl() {
         return url;
+    }
+
+    public void setHttpMethod(HttpMethod httpMethod) {
+        this.httpMethod = httpMethod;
     }
 
     public HttpMethod getHttpMethod() {

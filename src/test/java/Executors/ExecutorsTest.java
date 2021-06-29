@@ -1,8 +1,7 @@
 package Executors;
 
-import com.srabby.http.common.requests.HttpMethod;
 import com.srabby.http.common.requests.Request;
-import com.srabby.http.common.requests.RequestBuilder;
+import com.srabby.http.common.RequestBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,7 +14,6 @@ public class ExecutorsTest {
         ConcreteExecutorsList.getList().forEach(requestExecutor -> {
             //create Request
             Request request = new RequestBuilder()
-                    .setHttpMethod(HttpMethod.GET)
                     .setUrl(url)
                     .cssRequest(cssSelector)
                     .build();
@@ -25,5 +23,29 @@ public class ExecutorsTest {
 
             Assert.assertNotNull(request.getResponse());
         });
+    }
+
+    @Test
+    public void multiThreadingTest(){
+        ConcreteExecutorsList.getList().forEach(requestExecutor -> {
+            //add 10 request to requestExecutor
+            for (int i = 0; i < 10; i++) {
+                //create Request
+                requestExecutor.addRequest(
+                        new RequestBuilder()
+                                .setUrl(url)
+                                .cssRequest(cssSelector)
+                                .build());
+            }
+
+
+            requestExecutor.executeRequestsSimultaneously();
+            int i = 0;
+            while (!requestExecutor.executionComplete()){
+                i += 1;
+                i -= 1;
+            }
+        });
+
     }
 }

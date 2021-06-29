@@ -1,5 +1,7 @@
 package com.srabby.http.common.requests;
 
+import com.srabby.http.common.RequestExecutor;
+
 public class ScriptRequest extends Request{
     private String script;
 
