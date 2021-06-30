@@ -1,24 +1,25 @@
 package com.srabby.http.common.requests;
 
-import com.srabby.http.common.RequestExecutor;
+import com.srabby.http.common.execution_strategies.selenium.ScriptExecutionStrategy;
+import com.srabby.http.exceptions.ScrapeException;
 
 public class ScriptRequest extends Request{
-    private String script;
-
     public ScriptRequest(String script) {
-        this.script = script;
+        super(new ScriptExecutionStrategy());
+        this.requestBody = script;
     }
 
-    public String getScript() {
-        return script;
+    public String getSelector() {
+        return requestBody;
     }
 
     @Override
-    public void execute(RequestExecutor requestExecutor) {
+    //Select nodes, which match to selector
+    public void execute() throws ScrapeException {
         //dispatch start event
         getEventListeners().forEach(eventListener -> eventListener.onStart(this));
 
-        requestExecutor.executeScriptRequest(this);
+        this.executionStrategy.execute(this);
 
         //dispatch finish event
         getEventListeners().forEach(eventListener -> eventListener.onFinish(this));

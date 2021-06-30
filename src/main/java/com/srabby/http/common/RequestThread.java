@@ -1,18 +1,18 @@
 package com.srabby.http.common;
 
 import com.srabby.http.common.requests.Request;
-import com.srabby.http.errors.ScrapeErrors;
+import com.srabby.http.exceptions.ScrapeException;
 
 public class RequestThread extends Thread{
-    private RequestExecutor requestExecutor;
+    private ConcurrentRequestExecutor concurrentRequestExecutor;
     private Request request;
     private boolean terminated = false;
     private int maxRerunCount = 3;
     private int rerunCount = 0;
 
-    RequestThread(RequestExecutor requestExecutor, Request request){
+    RequestThread(ConcurrentRequestExecutor concurrentRequestExecutor, Request request){
         super();
-        this.requestExecutor = requestExecutor;
+        this.concurrentRequestExecutor = concurrentRequestExecutor;
         this.request = request;
     }
 
@@ -29,9 +29,9 @@ public class RequestThread extends Thread{
         rerunCount += 1;
         try{
             //execute request
-            request.execute(requestExecutor);
+            request.execute();
 
-        }catch (ScrapeErrors e){
+        }catch (ScrapeException e){
             //request set error
             request.setErrorMessage(e.getMessage());
 

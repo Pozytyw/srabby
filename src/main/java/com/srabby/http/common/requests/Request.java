@@ -1,9 +1,8 @@
 package com.srabby.http.common.requests;
 
+import com.srabby.http.common.execution_strategies.ExecutionStrategy;
 import com.srabby.http.common.HttpMethod;
-import com.srabby.http.common.RequestEventListener;
-import com.srabby.http.common.RequestExecutor;
-import com.srabby.http.errors.ScrapeErrors;
+import com.srabby.http.exceptions.ScrapeException;
 
 import java.util.*;
 
@@ -11,6 +10,8 @@ public abstract class Request {
     protected String url;
     protected HttpMethod httpMethod;
     protected Map<String, String> httpHeaders;
+    protected ExecutionStrategy executionStrategy;
+    protected String requestBody;
 
     protected Set<String> response;
     //listeners
@@ -20,8 +21,13 @@ public abstract class Request {
     protected boolean error = false;
     protected String errorMessage;
 
-    public abstract void execute(RequestExecutor requestExecutor) throws ScrapeErrors;
+    public Request(ExecutionStrategy executionStrategy) {
+        this.executionStrategy = executionStrategy;
+    }
 
+    public abstract void execute() throws ScrapeException;
+
+    //getters and setters
     public void setUrl(String url) {
         this.url = url;
     }
@@ -72,6 +78,11 @@ public abstract class Request {
         return httpHeaders;
     }
 
+    public String getRequestBody() {
+        return requestBody;
+    }
+
+    //event listeners
     public void addEventListener(RequestEventListener eventListener){
         if(eventListeners == null)
             eventListeners = new LinkedList<>();

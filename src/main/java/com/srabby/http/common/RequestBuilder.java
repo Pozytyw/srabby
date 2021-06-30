@@ -19,7 +19,7 @@ public final class RequestBuilder {
         request = new CSSRequest("body");
     }
 
-    //request constructor. Choice of certain request class
+    //request constructor. Choose of certain request class
     public RequestBuilder cssRequest(String selector){
         request = new CSSRequest(selector);
         return this;
@@ -27,16 +27,6 @@ public final class RequestBuilder {
 
     public RequestBuilder scriptRequest(String script){
         request = new ScriptRequest(script);
-        return this;
-    }
-
-    public RequestBuilder postRequest(String postBody){
-        request = new PostRequest(postBody);
-        return this;
-    }
-
-    public RequestBuilder getRequest(String requestBody){
-        request = new GetRequest(requestBody);
         return this;
     }
 

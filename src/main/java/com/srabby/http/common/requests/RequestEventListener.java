@@ -1,4 +1,4 @@
-package com.srabby.http.common;
+package com.srabby.http.common.requests;
 
 import com.srabby.http.common.requests.Request;
 

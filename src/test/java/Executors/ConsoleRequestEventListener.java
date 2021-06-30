@@ -1,6 +1,6 @@
-package com.srabby.application;
+package Executors;
 
-import com.srabby.http.common.RequestEventListener;
+import com.srabby.http.common.requests.RequestEventListener;
 import com.srabby.http.common.requests.Request;
 
 public class ConsoleRequestEventListener implements RequestEventListener {
