@@ -31,4 +31,4 @@
     
 ```
 Notice that ConcurrentRequestExecutor don't use ``` join() ``` thread's method.
-Use ``` requestExecutor.isRunning() ``` to check if all of request's thread ended their jobs. 
+Use ``` requestExecutor.isRunning() ``` to check if all of request's threads ended their jobs. 
