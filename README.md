@@ -30,5 +30,5 @@
     requestExecutor.executeRequestsSimultaneously();
     
 ```
-Notice that ConcurrentRequestExecutor don't use ``` join() ``` threahd's method.
+Notice that ConcurrentRequestExecutor don't use ``` join() ``` thread's method.
 Use ``` requestExecutor.isRunning() ``` to check if all of request's thread ended their jobs. 
